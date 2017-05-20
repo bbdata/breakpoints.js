@@ -10,18 +10,30 @@
     
     this.currentBreakpoint = null;
     this.previousBreakpoint = null;
+    this.handlers = {};
     
     // Sort the breakpoints in DESC order
-    this.options.breakpoints = this.options.breakpoints.sort(function(a, b) { return (b-a); });
+    this.options.breakpoints = this.options.breakpoints.sort(function(a, b) {
+      return (b-a);
+    });
+    
+    // Create a name for each breakpoint handler.
+    for (var i in this.options.breakpoints) {
+      var breakpoint = this.options.breakpoints[i],
+          eventName = 'breakpoint' + breakpoint;
+          
+      this.handlers['breakpoint' + breakpoint] = [];
+    }
   }
   
   // Public
   Breakpoints.getDeviceWidth = function() {
     /**
-     * Some libraries functions like jQuery.width() and those in Google Publisher Tag will return 
-     * a normalized document width exclulding the scrollbar for cross browser support.
+     * Some libraries like jQuery and Google Publisher Tag uses a normalized document 
+     * width excluding the scrollbar for cross browser support.
      *
-     * This is not desirable when working with CSS media queries where the device width is used.
+     * This is not desirable when working with CSS media queries where the device width
+     * is used.
      *
      * What we need to do is measure the viewport width instead.
      * .innerWidth - Used for more standards compliant browsers like FireFox and Chrome.
@@ -51,9 +63,8 @@
     
     // Fire off the functions for this breakpoint.
     if (this.currentBreakpoint != this.previousBreakpoint) {
-      //handle_breakpoints(window.current_breakpoint, previous_breakpoint);
       this.previousBreakpoint = this.currentBreakpoint;
-console.log(this.currentBreakpoint);
+      this.fireBreakpoint('breakpoint' + this.currentBreakpoint);
     }
   };
   
@@ -78,6 +89,24 @@ console.log(this.currentBreakpoint);
     }
     return args[0];
   };
+  
+  // Public
+  Breakpoints.prototype.addBreakpointHandler = 
+  Breakpoints.prototype.addEventListener = function(event, fn) {
+    this.handlers[event].push(fn);
+  };
+  
+  Breakpoints.prototype.fireBreakpoint = function(event){
+    var args = [].slice.call(arguments, 1), 
+        callbacks = this.handlers[event];
+  
+    if (callbacks) {
+      callbacks = callbacks.slice(0);
+      for (var i = 0, len = callbacks.length; i < len; ++i) {
+        callbacks[i].apply(this, args);
+      }
+    }
+  };
 
   Breakpoints.defaults = {
     breakpoints: [0, 768, 992, 1200],
@@ -101,4 +130,20 @@ window.addEventListener('resize', function() {
   bp.options.timeout = setTimeout(function(){
     bp.handleResize();
   }, bp.options.delay);
+});
+
+bp.addBreakpointHandler('breakpoint0', function(){
+  console.log('mobile');
+});
+
+bp.addBreakpointHandler('breakpoint768', function(){
+  console.log('wide mobile, small tablet');
+});
+
+bp.addBreakpointHandler('breakpoint992', function(){
+  console.log('wide tablet');
+});
+
+bp.addBreakpointHandler('breakpoint1200', function(){
+  console.log('desktop');
 });
