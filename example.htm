@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title></title>
+</head>
+
+<body>
+
+<script type="text/javascript">
+(function() {
+  var e = document.createElement('script');
+  e.type = 'text/javascript';
+  e.async = true;
+  e.src = 'breakpoints.js';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(e, s);
+  // Wait for script to load
+  e.onload = function(){
+    // Create Breakpoints
+    window.breakpoints = new Breakpoints({
+      variableName: 'breakpoints',
+      breakpoints: [0, 768, 948, 1008, 1026],
+    }, window.breakpoints.q);
+    
+    // Initialize Breakpoints
+    window.breakpoints.init();
+  };
+})();
+</script>
+
+<script>
+  var breakpoints = breakpoints || {};
+      breakpoints.q = breakpoints.q || [];
+  
+  breakpoints.q.push(function() {
+    breakpoints.addBreakpointHandler('breakpoints0', function(){
+      console.log('mobile');
+    });
+    
+    breakpoints.addBreakpointHandler('breakpoints768', function(){
+      console.log(768);
+    });
+    
+    breakpoints.addBreakpointHandler('breakpoints948', function(){
+      console.log(948);
+    });
+    
+    breakpoints.addBreakpointHandler('breakpoints1008', function(){
+      console.log(1008);
+    });
+    
+    breakpoints.addBreakpointHandler('breakpoints1026', function(){
+      console.log(1026);
+    });
+  });
+</script>
+
+</body>
+
+</html>
